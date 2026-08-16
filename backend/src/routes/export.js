@@ -10,8 +10,8 @@ import { authMiddleware, requireRole } from '../middleware/auth.js';
 
 const router = Router();
 
-function toCSV(rows: any[], headers: string[]) {
-  const esc = (v: any) => {
+function toCSV(rows, headers) {
+  const esc = (v) => {
     if (v === null || v === undefined) return '';
     const s = String(v);
     if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replace(/"/g, '""') + '"';

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const taskSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
-    taskCode: { type: String, unique: true, index: true },
+    taskCode: { type: String, unique: true, index: true, default: () => `TASK-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2,6).toUpperCase()}` },
     description: { type: String, default: '' },
     project: { type: String, default: 'General' },
     projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
@@ -30,14 +30,6 @@ const taskSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-taskSchema.pre('save', function (next) {
-  if (!this.taskCode) {
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
-    this.taskCode = `TASK-${timestamp}-${randomPart}`;
-  }
-  next();
-});
 
 taskSchema.methods.toJSON = function () {
   const obj = this.toObject();

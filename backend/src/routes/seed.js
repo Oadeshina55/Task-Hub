@@ -63,7 +63,19 @@ router.post('/', async (req, res) => {
       { title: 'Share updated user personas', project: 'Research sprint', status: 'done', priority: 'low', dueDate: 'Oct 25', assignedTo: 'SL', label: 'Research', createdBy: manager._id },
       { title: 'Set up team retro', project: 'Website redesign', status: 'todo', priority: 'low', dueDate: 'Nov 01', assignedTo: 'JK', label: 'Team', createdBy: admin._id },
     ];
-    await Task.insertMany(tasks);
+    // Use individual saves so `pre('save')` hooks run and generate unique taskCode
+    console.log('Seeding tasks, count=', tasks.length);
+    for (const t of tasks) {
+      if (!t.taskCode) {
+        const timestamp = Date.now().toString(36).toUpperCase();
+        const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+        t.taskCode = `TASK-${timestamp}-${randomPart}`;
+      }
+      console.log('Saving task with taskCode=', t.taskCode);
+      const taskDoc = new Task(t);
+      await taskDoc.save();
+      console.log('Saved task id=', taskDoc._id, 'code=', taskDoc.taskCode);
+    }
       // sample vouchers
       const memberUser = await User.findOne({ role: 'member' });
       const managerUser = await User.findOne({ role: 'manager' });
